@@ -31,9 +31,7 @@ services:
     restart: always
     ports:
       - 4080:4080
-    depends_on:
-      - api
-      - live
     environment:
       - NEXT_PUBLIC_LIVE_SOCKET_URL=http://localhost:4010
       - NEXT_PUBLIC_API_URL=http://localhost:4050
+      - PORT=4080
