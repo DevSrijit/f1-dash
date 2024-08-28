@@ -19,17 +19,17 @@ RUN npm install
 RUN npm run build
 
 # Final stage: API service
-FROM alpine:3 as api
+FROM alpine:3 AS api
 COPY --from=builder /usr/src/app/target/release/api /api
 CMD [ "/api" ]
 
 # Final stage: Live service
-FROM alpine:3 as live
+FROM alpine:3 AS live
 COPY --from=builder /usr/src/app/target/release/live /live
 CMD [ "/live" ]
 
 # Final stage: Frontend service
-FROM node:20-alpine as frontend
+FROM node:20-alpine AS frontend
 
 WORKDIR /usr/src/app/dash
 COPY --from=frontend-builder /usr/src/app/dash ./
