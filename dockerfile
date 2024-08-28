@@ -7,7 +7,7 @@ COPY . .
 RUN apk add --no-cache musl-dev pkgconfig openssl libressl-dev
 
 # only builds default members (live and api)
-RUN cargo b -r
+RUN cargo build --release
 
 # Build the Next.js frontend
 FROM node:20-alpine AS frontend-builder
@@ -18,19 +18,18 @@ COPY ./dash .
 RUN npm install
 RUN npm run build
 
-# API service
+# Final stage: API service
 FROM alpine:3 as api
 COPY --from=builder /usr/src/app/target/release/api /api
 CMD [ "/api" ]
 
-# Live service
+# Final stage: Live service
 FROM alpine:3 as live
 COPY --from=builder /usr/src/app/target/release/live /live
 CMD [ "/live" ]
 
-# Frontend service
-FROM alpine:3 as frontend
-RUN apk add --no-cache nodejs npm
+# Final stage: Frontend service
+FROM node:20-alpine as frontend
 
 WORKDIR /usr/src/app/dash
 COPY --from=frontend-builder /usr/src/app/dash ./
