@@ -21,3 +21,17 @@ services:
     environment:
       - API_BACKEND_ADDRESS=0.0.0.0:4050
       - RUST_LOG=api=debug
+
+  #frontend:
+    #build:
+      #context: ./dash/
+      #args:
+        #- NEXT_PUBLIC_LIVE_SOCKET_URL=https://live.f1.srijit.co
+        #- NEXT_PUBLIC_API_URL=https://api.f1.srijit.co
+    #restart: always
+    #ports:
+      #- 4080:4080
+    #environment:
+      #- NEXT_PUBLIC_LIVE_SOCKET_URL=https://live.f1.srijit.co
+      #- NEXT_PUBLIC_API_URL=https://api.f1.srijit.co
+      #- PORT=4080
