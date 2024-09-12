@@ -45,9 +45,13 @@ async fn keep_client_alive(tx: Sender<LiveEvent>, state: LiveState) {
         let parsed_stream = client::parse_stream(stream).await;
 
         info!("Handling the client stream...");
-        handle_stream(parsed_stream, tx.clone(), state.clone()).await;
+        let should_restart = handle_stream(parsed_stream, tx.clone(), state.clone()).await;
 
-        // Add log to indicate a restart
+        if should_restart {
+            info!("Session change detected, restarting client immediately...");
+            continue; // Restart the loop immediately
+        }
+
         info!("Client stream handling ended, restarting in 5 seconds...");
         sleep(Duration::from_secs(5)).await; // Pause to avoid immediate loop cycling
     }
@@ -57,7 +61,7 @@ async fn handle_stream(
     stream: impl Stream<Item = client::message::Message>,
     tx: Sender<LiveEvent>,
     state: LiveState,
-) {
+) -> bool {
     pin_mut!(stream);
 
     // Iterate over the incoming messages from the stream
@@ -84,7 +88,7 @@ async fn handle_stream(
                                 "Session name changed from {:?} to {:?}, restarting client",
                                 current_session_name, new_session_name
                             );
-                            return; // Exit to restart the client loop
+                            return true; // Signal that a restart is needed
                         }
                     }
 
@@ -135,4 +139,6 @@ async fn handle_stream(
             }
         }
     }
+    
+    false // No restart needed if we reach this point
 }
